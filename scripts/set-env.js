@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const apiUrl = process.env.API_URL || 'https://api.qabel.io/api/v1';
-const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
+const apiUrl = (process.env.API_URL || 'https://api.qabel.io/api/v1').trim();
+const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
 
 if (!googleClientId) {
   console.warn('⚠️  WARNING: GOOGLE_CLIENT_ID env var is not set. Google OAuth will not work.');
