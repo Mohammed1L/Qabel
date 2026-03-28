@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const apiUrl = (process.env.API_URL || 'https://api.qabel.io/api/v1').trim();
+const apiUrl = (process.env.API_URL || 'https://api.qabel.live/api/v1').trim();
 const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
 
 if (!googleClientId) {
