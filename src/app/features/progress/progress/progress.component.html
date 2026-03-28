@@ -1,0 +1,69 @@
+<div class="page-header">
+  <div>
+    <h1>{{ lang.t('progress.title') }}</h1>
+  </div>
+  <a class="primary-btn" routerLink="/app/session/start">
+    + {{ lang.t('progress.newSession') }}
+  </a>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner [message]="lang.t('progress.loading')" />
+} @else if (error()) {
+  <app-error-banner [message]="error()!" (dismissed)="error.set(null)" />
+} @else if (progress(); as p) {
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <span class="kpi-value">{{ p.totalSessions }}</span>
+      <span class="kpi-label">{{ lang.t('progress.totalSessions') }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value">{{ p.totalQuestionsAnswered }}</span>
+      <span class="kpi-label">Questions Answered</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value">{{ p.averageScore | number:'1.0-0' }}</span>
+      <span class="kpi-label">{{ lang.t('progress.avgScore') }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value score-green">{{ p.highestScore }}</span>
+      <span class="kpi-label">Highest Score</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value score-red">{{ p.lowestScore }}</span>
+      <span class="kpi-label">Lowest Score</span>
+    </div>
+  </div>
+
+  <!-- Sessions list -->
+  @if (p.sessions.length) {
+    <div class="section-card">
+      <h2 class="section-title">{{ lang.t('progress.recentSessions') }}</h2>
+      <div class="session-list">
+        @for (s of p.sessions; track s.sessionId) {
+          <button class="session-card" (click)="openSession(s.sessionId)">
+            <div class="session-main">
+              <span class="session-job">{{ s.jobPosting }}</span>
+              <div class="session-meta">
+                <span>{{ s.createdAt | date:'MMM d, y' }}</span>
+                <span class="meta-dot">·</span>
+                <span>{{ s.totalQuestions }} questions</span>
+              </div>
+            </div>
+            <div class="session-score" [class]="getScoreClass(s.averageScore)">
+              {{ s.averageScore | number:'1.0-0' }}<span class="score-denom">/100</span>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="empty-sessions">
+      <p>No sessions yet. Start your first interview to see results here.</p>
+      <a class="primary-btn" routerLink="/app/session/start">Start Interview</a>
+    </div>
+  }
+
+}

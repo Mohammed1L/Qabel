@@ -1,0 +1,195 @@
+<div class="chat-wrapper">
+
+    <div class="tip-banner">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 21h6M10 17v1a2 2 0 0 0 4 0v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      The more detailed and thoughtful your answers, the better and more useful your feedback will be.
+    </div>
+
+    <!-- ── Messages ── -->
+    <div class="chat-messages" #chatMessages>
+
+      @for (bubble of chatBubbles(); track bubble.id) {
+
+        @if (bubble.role === 'ai') {
+          <div class="msg-row msg-row--ai">
+            <div class="ai-avatar" [ngClass]="getCategoryClass(bubble.category)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="msg-bubble msg-bubble--ai" [ngClass]="getCategoryClass(bubble.category)">
+              <div class="bubble-meta">
+                @if (!bubble.isFollowUp) {
+                  <span class="category-badge" [ngClass]="getCategoryClass(bubble.category)">
+                    {{ bubble.category }}
+                  </span>
+                  <span class="difficulty-badge">{{ bubble.difficulty }}</span>
+                } @else {
+                  <span class="followup-label">↳ Follow-up</span>
+                }
+              </div>
+
+              <p class="bubble-text">{{ bubble.text }}</p>
+
+              @if (bubble.feedbackData && !bubble.feedbackShown) {
+                <button class="get-feedback-btn" (click)="showFeedback(bubble.id)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                          stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Get Feedback
+                </button>
+              }
+
+              @if (bubble.feedbackData && bubble.feedbackShown) {
+                <div class="inline-feedback">
+                  <div class="fb-score-row">
+                    <span class="fb-score-label">Score</span>
+                    <span
+                      class="fb-score-val"
+                      [class.score--high]="bubble.feedbackData.aiScore >= 70"
+                      [class.score--low]="bubble.feedbackData.aiScore < 50"
+                    >{{ bubble.feedbackData.aiScore }}/100</span>
+                  </div>
+                  <div class="score-bar-wrap">
+                    <div
+                      class="score-bar-fill"
+                      [class.score-bar-fill--high]="bubble.feedbackData.aiScore >= 70"
+                      [class.score-bar-fill--low]="bubble.feedbackData.aiScore < 50"
+                      [style.width.%]="bubble.feedbackData.aiScore"
+                    ></div>
+                  </div>
+                  <p class="fb-body">{{ bubble.feedbackData.aiFeedback }}</p>
+                  <div class="ideal-box">
+                    <span class="ideal-label">Ideal Answer</span>
+                    <p class="ideal-text">{{ bubble.feedbackData.idealAnswer }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+        } @else {
+          <div class="msg-row msg-row--user">
+            <div class="msg-bubble msg-bubble--user">{{ bubble.text }}</div>
+          </div>
+        }
+
+      }
+
+      <!-- Typing indicator while loading / submitting -->
+      @if (loading() || submitting()) {
+        <div class="msg-row msg-row--ai">
+          <div class="ai-avatar cat--default">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="msg-bubble msg-bubble--ai msg-bubble--typing cat--default">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+      }
+
+      @if (error()) {
+        <app-error-banner [message]="error()!" (dismissed)="error.set(null)" />
+      }
+
+    </div>
+
+    <!-- ── End Interview button ── -->
+    @if (!isComplete() && !loading()) {
+      <div class="end-interview-row">
+        <button class="end-interview-btn" (click)="confirmEndInterview()" [disabled]="ending()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          {{ ending() ? 'Ending...' : 'End Interview' }}
+        </button>
+      </div>
+    }
+
+    <!-- ── Confirmation dialog ── -->
+    @if (showEndConfirm()) {
+      <div class="confirm-overlay" (click)="cancelEndInterview()">
+        <div class="confirm-dialog" (click)="$event.stopPropagation()">
+          <div class="confirm-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="confirm-title">End interview early?</h3>
+          <p class="confirm-text">
+            Are you sure you want to end the interview now? Completing the full session gives you much better and more accurate feedback. We recommend finishing all the questions for the best results.
+          </p>
+          <div class="confirm-actions">
+            <button class="confirm-cancel-btn" (click)="cancelEndInterview()">Continue Interview</button>
+            <button class="confirm-end-btn" (click)="endInterview()">Yes, End Now</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ── Interview complete banner ── -->
+    @if (isComplete()) {
+      <div class="complete-banner">
+        <div class="complete-banner__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="complete-banner__reason">{{ completionReason() }}</p>
+        <button class="send-btn" (click)="goToReview()">
+          View Results
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    }
+
+    <!-- ── Input area ── -->
+    @if (isWaitingForAnswer() && !loading() && !isComplete()) {
+      <div class="chat-input-area">
+        <textarea
+          class="chat-textarea"
+          [formControl]="answerControl"
+          rows="3"
+          [placeholder]="lang.t('interview.answerPlaceholder')"
+        ></textarea>
+        @if (answerControl.touched && answerControl.hasError('minlength')) {
+          <span class="field-hint">Please provide a more detailed answer (min 20 characters)</span>
+        }
+        <div class="input-actions">
+          @if (submitting()) {
+            <app-loading-spinner [diameter]="28" [message]="lang.t('interview.evaluating')" />
+          } @else {
+            <button
+              class="send-btn"
+              (click)="sendAnswer()"
+              [disabled]="answerControl.invalid"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Send
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+  </div>

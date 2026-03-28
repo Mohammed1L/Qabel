@@ -1,0 +1,194 @@
+<div class="review-container">
+
+  <!-- ── Loading skeleton ── -->
+  @if (loading()) {
+    <div class="skeleton-header">
+      <div class="sk sk--title"></div>
+      <div class="sk sk--subtitle"></div>
+      <div class="sk-meta">
+        <div class="sk sk--chip"></div>
+        <div class="sk sk--chip"></div>
+        <div class="sk sk--chip"></div>
+      </div>
+    </div>
+    <div class="skeleton-cards">
+      @for (n of [1, 2, 3]; track n) {
+        <div class="sk-card">
+          <div class="sk sk--line sk--short"></div>
+          <div class="sk sk--line"></div>
+          <div class="sk sk--line sk--med"></div>
+          <div class="sk sk--bar"></div>
+          <div class="sk sk--line sk--med"></div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Error ── -->
+  @if (!loading() && error()) {
+    <app-error-banner [message]="error()!" (dismissed)="error.set(null)" />
+  }
+
+  <!-- ── Review content ── -->
+  @if (!loading() && review(); as rv) {
+
+    <!-- Header -->
+    <div class="review-header">
+      <div class="header-top">
+        <span class="complete-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Interview Complete
+        </span>
+      </div>
+      <h1 class="job-title">{{ jobTitle() }}</h1>
+      <div class="header-meta">
+        <span class="meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          {{ rv.createdAt | date:'MMMM d, y' }}
+        </span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item">
+          {{ answeredCount() }} question{{ answeredCount() !== 1 ? 's' : '' }}
+        </span>
+        @if (averageScore() !== null) {
+          <span class="meta-sep">·</span>
+          <span class="avg-score-badge" [class]="getScoreClass(averageScore())">
+            Avg {{ averageScore() }}/100
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Empty state -->
+    @if (!answeredCount()) {
+      <div class="empty-state">
+        <p>No answers were recorded for this session.</p>
+      </div>
+    }
+
+    <!-- Question cards -->
+    <div class="question-list">
+      @for (q of rv.questions; track q.questionId) {
+        @if (q.userAnswer) {
+          <div class="q-card">
+
+            <!-- Badges -->
+            <div class="q-badges">
+              <span class="category-badge" [class]="getCategoryClass(q.category)">
+                {{ q.category }}
+              </span>
+              <span class="difficulty-pill" [class]="getDifficultyClass(q.difficulty)">
+                {{ q.difficulty }}
+              </span>
+            </div>
+
+            <!-- Question text -->
+            <p class="q-text">{{ q.questionText }}</p>
+
+            <!-- User answer -->
+            <div class="answer-block">
+              <span class="block-label">Your Answer</span>
+              <p class="answer-text">{{ q.userAnswer }}</p>
+            </div>
+
+            <div class="card-divider"></div>
+
+            <!-- Score -->
+            <div class="score-row">
+              <span class="score-label">Score</span>
+              @if (q.aiScore !== null) {
+                <span class="score-val" [class]="getScoreClass(q.aiScore)">
+                  {{ q.aiScore }}/100
+                </span>
+              } @else {
+                <span class="score-not-evaluated">Not evaluated</span>
+              }
+            </div>
+            @if (q.aiScore !== null) {
+              <div class="score-bar-track">
+                <div
+                  class="score-bar-fill"
+                  [class]="getScoreClass(q.aiScore)"
+                  [style.width.%]="q.aiScore"
+                ></div>
+              </div>
+            }
+
+            <!-- Feedback -->
+            @if (q.aiFeedback) {
+              <div class="feedback-block">
+                <span class="block-label">Feedback</span>
+                <p class="feedback-text">{{ q.aiFeedback }}</p>
+              </div>
+            }
+
+            <!-- Follow-up questions -->
+            @if (q.followUpQuestions?.length) {
+              <div class="follow-up-section">
+                <span class="block-label">Follow-up Questions to Think About</span>
+                <div class="follow-up-list">
+                  @for (f of q.followUpQuestions!; track f.question) {
+                    <div class="followup-item">
+                      <p class="followup-question">{{ f.question }}</p>
+                      <p class="followup-ideal">{{ f.idealAnswer }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Ideal answer toggle -->
+            @if (q.idealAnswer) {
+              <button
+                class="ideal-toggle"
+                (click)="toggleIdeal(q.questionId)"
+                [attr.aria-expanded]="isExpanded(q.questionId)"
+              >
+                <svg
+                  class="toggle-icon"
+                  [class.toggle-icon--open]="isExpanded(q.questionId)"
+                  width="13" height="13" viewBox="0 0 24 24" fill="none"
+                >
+                  <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Ideal Answer
+              </button>
+
+              @if (isExpanded(q.questionId)) {
+                <div class="ideal-body">
+                  <p class="ideal-text">{{ q.idealAnswer }}</p>
+                </div>
+              }
+            }
+
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="review-footer">
+      <button class="btn btn--primary" (click)="goToNewInterview()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round"/>
+        </svg>
+        Start New Interview
+      </button>
+      <button class="btn btn--ghost" (click)="goToDashboard()">
+        Go to Dashboard
+      </button>
+    </div>
+
+  }
+
+</div>

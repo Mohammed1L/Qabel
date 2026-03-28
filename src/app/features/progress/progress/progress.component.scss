@@ -1,0 +1,186 @@
+:host { display: block; }
+
+// ─── Page header ──────────────────────────────────────────────────────────────
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.35rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #000;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
+
+  &:hover { opacity: 0.88; transform: translateY(-1px); }
+}
+
+// ─── KPI row ──────────────────────────────────────────────────────────────────
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.5rem;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+}
+
+.kpi-value {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  line-height: 1;
+
+  &.score-green  { color: #4eda80; }
+  &.score-orange { color: #ffb347; }
+  &.score-red    { color: #f87171; }
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+// ─── Section card ─────────────────────────────────────────────────────────────
+.section-card {
+  padding: 1.5rem;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.25rem;
+}
+
+.section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+// ─── Session cards ────────────────────────────────────────────────────────────
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.session-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  transition: background 0.15s;
+  width: 100%;
+
+  &:first-child {
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.session-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.session-job {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55ch;
+}
+
+.session-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.meta-dot { opacity: 0.4; }
+
+.session-score {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+
+  &.score-green  { color: #4eda80; }
+  &.score-orange { color: #ffb347; }
+  &.score-red    { color: #f87171; }
+}
+
+.score-denom {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.5;
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+.empty-sessions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .session-job { max-width: 30ch; }
+}

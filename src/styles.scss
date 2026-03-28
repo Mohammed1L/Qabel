@@ -1,1 +1,104 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// ─── Angular Material — force dark theme ─────────────────────────────────────
+html {
+  @include mat.theme((
+    color: (
+      primary:    mat.$azure-palette,
+      tertiary:   mat.$blue-palette,
+      theme-type: dark,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+// ─── Global design tokens (shared by all pages) ───────────────────────────────
+:root {
+  --bg:           #0c0d10;
+  --bg-elevated:  #13141a;
+  --bg-card:      #181920;
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-bright: rgba(255, 255, 255, 0.12);
+  --text-primary:  #ededf0;
+  --text-secondary: #7a7d8a;
+  --text-muted:    #4a4d5a;
+  --accent:        #ffffff;
+  --radius-sm:     6px;
+  --radius-md:     10px;
+  --radius-lg:     14px;
+}
+
+// ─── Reset & base ─────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color-scheme: dark;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir='rtl'] {
+  font-family: 'Zain', 'Rubik', system-ui, sans-serif;
+}
+
+// ─── Override Material surface colours to match our dark bg ──────────────────
+.mat-mdc-card {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-shape: var(--radius-sm);
+  --mdc-outlined-text-field-outline-color: var(--border-bright);
+  --mdc-outlined-text-field-hover-outline-color: rgba(255,255,255,0.25);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+}
+
+.mat-mdc-progress-bar {
+  --mdc-linear-progress-track-color: rgba(255,255,255,0.08);
+  height: 3px;
+  border-radius: 999px;
+}
+
+.mat-mdc-table {
+  background-color: var(--bg-card) !important;
+}
+
+.mat-mdc-header-row {
+  background-color: var(--bg-elevated) !important;
+}
+
+.mat-mdc-row {
+  background-color: var(--bg-card) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-secondary) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.mat-mdc-cell {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.mat-mdc-chip {
+  --mdc-chip-container-color: var(--bg-elevated);
+  --mdc-chip-label-text-color: var(--text-secondary);
+}

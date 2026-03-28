@@ -1,0 +1,28 @@
+@if (loading()) {
+  <app-loading-spinner message="Loading session…" />
+} @else if (error()) {
+  <app-error-banner [message]="error()!" (dismissed)="error.set(null)" />
+} @else if (session(); as s) {
+
+  <div class="detail-header">
+    <h1 class="detail-title">Interview Session</h1>
+    <span class="detail-date">{{ s.createdAt | date:'medium' }}</span>
+  </div>
+
+  <div class="posting-preview">
+    <span class="posting-label">Job Posting</span>
+    <p class="posting-text">{{ s.jobPosting }}</p>
+  </div>
+
+  <a
+    class="resume-btn"
+    [routerLink]="['/app/interview']"
+    [queryParams]="{ sessionId: s.id }"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"/>
+    </svg>
+    Resume Interview
+  </a>
+
+}
