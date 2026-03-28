@@ -11,6 +11,9 @@
     "serve:ssr:devintel-frontend": "node dist/devintel-frontend/server/server.mjs"
   },
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@angular/animations": "^21.2.5",
     "@angular/cdk": "^20.2.14",
